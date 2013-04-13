@@ -41,7 +41,7 @@ class RspecParser
   end
 end
 
-option = ARGV[0] | 'specs'
+option = ARGV[0] || 'specs'
 
 parser = RspecParser.new
 if option == 'specs'
