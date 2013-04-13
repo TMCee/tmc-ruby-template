@@ -1,5 +1,5 @@
 require 'rspec'
-require_relative '../lib/main.rb'
+require_relative '../lib/library.rb'
 
 describe Library do
   subject { Library.new }
@@ -8,3 +8,7 @@ describe Library do
   its(:returns_zero) { should == 0 }
   its(:returns_zero) { should == 1 }
 end
+__END__
+1.1
+1.2
+1.3

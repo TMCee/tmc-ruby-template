@@ -1,1 +1,1 @@
-ruby .universal/controls/rspec_parser.rb
+ruby .universal/controls/rspec_parser.rb specs

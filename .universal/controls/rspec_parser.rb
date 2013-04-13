@@ -7,6 +7,11 @@ class Spec
     @name = name
     @status = status
     @backtrace = backtrace
+    @point_names = []
+  end
+
+  def json_dump
+    { 'methodName' => @name, 'valgrindTrace' => @backtrace, 'successful' => (status == "passed") }
   end
 
 end
@@ -17,27 +22,42 @@ class RspecParser
   # Context is the root directory of the project, as given when run with .universal/conrols/test
   def parse
     json = `rspec -f j spec/ 2> /dev/null`
-    parse_spsecs(json)
+    parse_specs(json)
   end
 
   def parse_specs(json)
     @specs = []
     json = JSON.parse(json)
     json['examples'].each do |example|
-      spec = Spec.new("#{example['full_description']} #{example['description']}", example['status'])
-      spec.backtrace = "#{example['exception']['class']}\n#{example['exception']['message']}\nexample['exception']['backtrace']" unless example['exception'].nil?
+      spec = Spec.new("#{example['full_description']}#{example['description']}".gsub(" ", "_"), example['status'])
+      spec.backtrace = "#{example['exception']['class']}\n#{example['exception']['message']}\n#{example['exception']['backtrace']}" unless example['exception'].nil?
       @specs << spec
     end
   end
 
-  def parse_points(input_file_content)
-    lines = input_file_content.split("\n")
-    lines.each do |line|
-      line.chomp!
-      point_names = line.split(" ").drop(1)
-      test_name = line.split(" ").first
-      @specs[test_name].point_names = point_names
+  def parse_points
+    spec_file_names = Dir.glob("spec/*")
+    spec_file_names.each do |spec_file_name|
+      content = File.read(spec_file_name)
+      lines = content.split("__END__\n").last.chomp.split("\n")
+      0.upto(lines.count - 1) do |i|
+        @specs[i].point_names = lines[i].chomp unless @specs[i].nil?
+      end
     end
+  end
+
+  def dump_points
+    @specs.each do |spec|
+      puts "#{spec.name} #{spec.point_names}"
+    end
+  end
+
+  def dump_results
+    results = []
+    @specs.each do |spec|
+      results << spec.json_dump
+    end 
+    puts JSON.generate results
   end
 end
 
@@ -46,6 +66,11 @@ option = ARGV[0] || 'specs'
 parser = RspecParser.new
 if option == 'specs'
   parser.parse
+  parser.dump_results
+elsif option == 'points'
+  parser.parse
+  parser.parse_points
+  parser.dump_points
 else
-  parser.parse_points("moi")
+  puts "Error. Invalid option."
 end
