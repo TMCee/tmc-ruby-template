@@ -11,7 +11,9 @@ class Spec
   end
 
   def json_dump
-    { 'methodName' => @name, 'valgrindTrace' => @backtrace, 'successful' => (status == "passed") }
+    hash = { 'methodName' => @name, 'valgrindTrace' => @backtrace, 'successful' => (status == "passed") }
+    hash['pointNames'] = @point_names unless @point_names.nil?
+    hash
   end
 
 end
@@ -41,14 +43,14 @@ class RspecParser
       content = File.read(spec_file_name)
       lines = content.split("__END__\n").last.chomp.split("\n")
       0.upto(lines.count - 1) do |i|
-        @specs[i].point_names = lines[i].chomp unless @specs[i].nil?
+        @specs[i].point_names = lines[i].chomp.split(" ") unless @specs[i].nil?
       end
     end
   end
 
   def dump_points
     @specs.each do |spec|
-      puts "#{spec.name} #{spec.point_names}"
+      puts "#{spec.name} #{spec.point_names.join(" ")}"
     end
   end
 
@@ -66,6 +68,7 @@ option = ARGV[0] || 'specs'
 parser = RspecParser.new
 if option == 'specs'
   parser.parse
+  parser.parse_points
   parser.dump_results
 elsif option == 'points'
   parser.parse
