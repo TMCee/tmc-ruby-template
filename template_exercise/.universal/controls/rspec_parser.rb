@@ -50,7 +50,7 @@ class RspecParser
 
   def dump_points
     @specs.each do |spec|
-      puts "#{spec.name} #{spec.point_names.join(" ")}"
+      spec.point_names.each {|point_name| puts point_name}
     end
   end
 
