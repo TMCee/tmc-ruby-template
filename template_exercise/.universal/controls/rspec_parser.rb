@@ -12,7 +12,7 @@ class Spec
   end
 
   def json_dump
-    hash = { 'methodName' => @name, 'valgrindTrace' => @backtrace, 'status' => @status.upcase}
+    hash = { 'methodName' => @name, 'backtrace' => @backtrace, 'status' => @status.upcase}
     hash['pointNames'] = @point_names unless @point_names.nil?
     hash
   end
