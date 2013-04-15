@@ -7,6 +7,7 @@ describe Library do
   its(:hello_world) { should == "Hello world!" }
   its(:returns_zero) { should == 0 }
   its(:returns_zero) { should == 1 }
+
 end
 __END__
 1.1
