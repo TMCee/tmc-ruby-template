@@ -49,6 +49,17 @@ class RspecParser
     end
   end
 
+  def dump_only_points
+    spec_file_names = Dir.glob("spec/*")
+    spec_file_names.each do |spec_file_name|
+      content = File.read(spec_file_name)
+      lines = content.split("__END__\n").last.chomp.split("\n")
+      lines.each do |line|
+        puts line
+      end
+    end
+  end
+
   def dump_points
     @specs.each do |spec|
       spec.point_names.each {|point_name| puts point_name}
@@ -72,9 +83,7 @@ if option == 'specs'
   parser.parse_points
   parser.dump_results
 elsif option == 'points'
-  parser.parse
-  parser.parse_points
-  parser.dump_points
+  parser.dump_only_points
 else
   puts "Error. Invalid option."
 end
